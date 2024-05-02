@@ -1,0 +1,25 @@
+/* Basic settings to set the height of the extension and ensure that the extension header/footer do not scroll */
+body {
+    min-height: 700px;
+    height: 100%;
+    overflow-y: hidden;
+  }
+  
+  /* Enable vertical scrolling of the main extension content */
+  .ise-extension-content {
+    overflow-y: scroll;
+  }
+  
+  /* Style our memos.  These use var with --text1 and --background2 to ensure content matches the ISE theme */
+  .memo {
+    color: var(--text1);
+    background: var(--background2);
+    border-color: var(--text1) !important;
+    font-size:0.85rem;
+    word-wrap: break-word;
+  }
+  
+  .memoHeader {
+    background: #003;
+    color: #fff;
+  }

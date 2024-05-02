@@ -1,0 +1,8 @@
+{
+    "name": "KBA Scratchpad",
+    "description": "Extension to save frequently used KBAs",
+    "type": "extension",
+    "icon": "fas list-alt",
+    "global": true,
+    "persistent": false
+}

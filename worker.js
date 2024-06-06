@@ -2,17 +2,21 @@
 const { ise } = require(process.env.ise);
 const fs = require("fs");
 
+let kbaData ={};
+
 // Handle events for the extension window
 // ise.window.onShow is called whenever the extension window is opened or closed
 ise.window.onShow((show) => {
   if (show){
-    try{
-      fs.promises.readFile("./kbas.txt").then(function(result){
-        navigator.clipboard.writeText(result);
-      })
-    }catch(error){
-      ise.window.maximize();
-    }
-    
+    loadKBAFile();    
   }
 });
+
+const loadKBAFile = () => {
+  //Load KBA file and send data via kbaData to the extension window
+      fs.readFile("./kbas.csv", 'utf8', (err,result)=>{
+        ise.extension.sendEventToWindow("load-kba-file", result);
+      });
+};
+
+

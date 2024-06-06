@@ -1,5 +1,6 @@
 
-   ise.extension.initWindow(800);
+   ise.extension.initWindow(900);
+   
 
    /* Intercept clicks which have an href - these should be opened in an ISE tab, not the extension window */
    document.addEventListener("click", (e) => {
@@ -25,15 +26,25 @@
 
    async function copyKbaId(){
 
-   const fs = require("fs").promises;
+   
     /*kbaid = document.getElementById("kba-id-name").innerText
     kbaid = kbaid.split(" ");
     navigator.clipboard.writeText(kbaid[0]);*/
 
     try{
-        /*const data = await fs.readFile("kbas.txt");
-        navigator.clipboard.writeText(data.toString());*/
-        await fs.writeFile('test.csv','test cvs write file');
+        /*const fs = require("fs").promises;
+        const data = await fs.readFile("kbas.txt");
+        navigator.clipboard.writeText(data.toString());
+        await fs.writeFile('test.csv','test cvs write file');*/
+
+        //chrome.storage.local.set({ "kbaID" : "this string is stored" });
+        /*chrome.storage.local.get(["kbaID"]).then((result) => {
+          navigator.clipboard.writeText("bla"+result.kbaID);
+        });*/
+        fs.promises.readFile("./kbas.txt").then(function(result){
+          navigator.clipboard.writeText(result);
+        })
+
     }catch(error){
         navigator.clipboard.writeText(error);
     }

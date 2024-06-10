@@ -1,6 +1,7 @@
 
    ise.extension.initWindow(700);
    
+   let currentKbaData;
 
    /* Intercept clicks which have an href - these should be opened in an ISE tab, not the extension window */
    document.addEventListener("click", (e) => {
@@ -29,14 +30,24 @@
    }
 
    function removeRow(id){
-    //todo: As table and IDs don't get updated yet, delete only works botom-up
     document.getElementById("scratchpad-kbas").deleteRow(id);
-   }
+    
+    currentKbaData.splice(id,1);
+    
+    ise.extension.sendEventToWorker('update-csv',currentKbaData);
+    ise.extension.sendEventToWorker('reload-table');
+  }
 
    ise.events.onEvent("load-kba-file",(kbaData)=>{
-    if(kbaData!= null) {
+    setKbaTable(kbaData);
+   });
+
+   function setKbaTable(kbaData){
+
+    if(kbaData!= "") {
       //create entries in extension window for each KBA
-      let kbaRows = kbaData.split("\n");
+      let kbaRows = kbaData.split(";");
+      currentKbaData = kbaRows;
       let windowKbaTable = document.getElementById("scratchpad-kbas");
       let windowKbaTableContent = document.createElement("table");
       windowKbaTableContent.setAttribute("class","table table-hover table-dark align-middle");
@@ -57,6 +68,8 @@
 
     }else{
       console.log("no results");
+      let windowKbaTable = document.getElementById("windowContent");
+      windowKbaTable.innerHTML = "<div align=\"center\">No KBAs</div>";
     }
-   });
-   
+
+   }

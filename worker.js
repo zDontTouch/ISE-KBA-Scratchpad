@@ -14,9 +14,17 @@ ise.window.onShow((show) => {
 
 const loadKBAFile = () => {
   //Load KBA file and send data via kbaData to the extension window
-      fs.readFile("./kbas.csv", 'utf8', (err,result)=>{
-        ise.extension.sendEventToWindow("load-kba-file", result);
-      });
+  fs.readFile("./kbas.csv", 'utf8', (err,result)=>{
+    ise.extension.sendEventToWindow("load-kba-file", result);
+  });
 };
 
+ise.events.onEvent('reload-table',()=>{
+  loadKBAFile();
+});
 
+ise.events.onEvent('update-csv',(currentKbaData)=>{
+  let csvData = currentKbaData.join(";");
+  fs.writeFileSync("./kbas.csv", csvData);
+  
+});

@@ -18,7 +18,8 @@
    });
 
    function copyKbaLink(id){
-    navigator.clipboard.writeText(document.getElementById("kba-name-id-"+id).getAttribute("href"));
+    navigator.clipboard.writeText("https://me.sap.com/notes/"+id);
+    //navigator.clipboard.writeText(document.getElementById("kba-name-id-"+id).getAttribute("href"));
    }
 
    function copyKbaIdAndName(id){
@@ -45,6 +46,12 @@
    function setKbaTable(kbaData){
 
     if(kbaData!= "") {
+      //remove the "No KBA" div
+      let noKbaDiv = document.getElementById("no-kba");
+      if(noKbaDiv != null){
+        noKbaDiv.parentElement.removeChild(noKbaDiv);
+      }
+
       //create entries in extension window for each KBA
       let kbaRows = kbaData.split(";");
       currentKbaData = kbaRows;
@@ -58,7 +65,7 @@
         kbaRow.setAttribute("id",i);
         
         let kbaRowContent = kbaRows[i].split(",");
-        kbaRow.innerHTML = "<td><button class=\"btn btn-outline-secondary btn-sm\" onclick=\"removeRow("+i+")\">X</button></td><td><a style=\"text-decoration:none\" id=\"kba-name-id-"+i+"\" href=\""+kbaRowContent[2]+"\">"+kbaRowContent[0]+" - "+kbaRowContent[1]+"</a></td><td><button class=\"btn btn-outline-secondary btn-sm\" onclick=\"copyKbaLink("+i+")\">Copy Link</button></td><td><button class=\"btn btn-outline-secondary btn-sm\" onclick=\"copyKbaId("+i+")\">Copy ID</button></td><td><button class=\"btn btn-outline-secondary btn-sm\" onclick=\"copyKbaIdAndName("+i+")\">Copy ID+Name</button></td>"
+        kbaRow.innerHTML = "<td><button class=\"btn btn-outline-secondary btn-sm\" onclick=\"removeRow("+i+")\"><i class=\"fa fa-trash\"></i></button></td><td><a style=\"text-decoration:none;\" id=\"kba-name-id-"+i+"\" href=\""+kbaRowContent[2]+"\">"+kbaRowContent[0]+" - "+kbaRowContent[1].slice(0,67)+((kbaRowContent[1].length >67) ? "..." : "")+"</a></td><td><button class=\"btn btn-outline-secondary btn-sm\" onclick=\"copyKbaLink("+kbaRowContent[0]+")\"><i class=\"fa-regular fa-copy\"></i>Customer Link</button></td><td><button class=\"btn btn-outline-secondary btn-sm\" onclick=\"copyKbaId("+i+")\"><i class=\"fa-regular fa-copy\"></i>ID</button></td><td><button class=\"btn btn-outline-secondary btn-sm\" onclick=\"copyKbaIdAndName("+i+")\"><i class=\"fa-regular fa-copy\"></i> Copy ID+Name</button></td>"
         
         windowKbaTableContent.appendChild(kbaRow);
         
@@ -67,9 +74,28 @@
       windowKbaTable.innerHTML = windowKbaTableContent.innerHTML;
 
     }else{
-      console.log("no results");
       let windowKbaTable = document.getElementById("windowContent");
-      windowKbaTable.innerHTML = "<div align=\"center\">No KBAs</div>";
+      //remove the "No KBA" div
+      let noKbaDiv = document.getElementById("no-kba");
+      if(noKbaDiv == null){
+        windowKbaTable.innerHTML = "<div id=\"no-kba\" align=\"center\">No KBAs</div>"+windowKbaTable.innerHTML;
+      }
+      
     }
 
+   }
+
+   function addKba(){
+    //trim and split new KBA string (<kbaid> - <kbaname>)
+    let kbaSplit = document.getElementById("newKbaInput").value.trim().split(" - ");
+    if(kbaSplit.length<2){
+      kbaSplit = document.getElementById("newKbaInput").value.split("-");
+    }
+    
+    currentKbaData.push(kbaSplit[0]+","+kbaSplit[1]+","+"https://support.wdf.sap.corp/sap/support/notes/"+kbaSplit[0]);
+    console.log(currentKbaData);
+    ise.extension.sendEventToWorker('update-csv',currentKbaData);
+    ise.extension.sendEventToWorker('reload-table');
+
+    document.getElementById("newKbaInput").value = "";
    }

@@ -5,15 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" type="text/css" href="index.css" />
     <script src="index.js" ></script>
-    
-
   </head>
   <body>
     <div class="ise-extension bg-dark">
       <div class="ise-extension-content" id="windowContent">
-            <table class="table table-hover table-dark align-middle" id="scratchpad-kbas">
-                  
+
+            <table class="table table-hover table-dark align-middle" id="scratchpad-kbas">   
             </table>
+
+            <div class="bg-dark" style="bottom:0%; margin:0%; position:sticky; padding-top:1%; padding-right: 5%; padding-left: 5%;">
+              <div class="input-group mb-3">
+                <input type="text" class="form-control bg-light" placeholder="Input a KBA title as '12345 - KBA Title'" id="newKbaInput">
+                <div class="input-group-append">
+                  <button class="btn btn-outline-secondary" type="button" onclick="addKba()">Add KBA</button>
+                </div>
+              </div>
+            </div>
+
       </div>
     </div>
   </body>

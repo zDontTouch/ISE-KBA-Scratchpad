@@ -1,6 +1,7 @@
 // Import the ise API
 const { ise } = require(process.env.ise);
 const fs = require("fs");
+const path = require("path");
 
 let kbaData ={};
 
@@ -15,9 +16,17 @@ ise.window.onShow((show) => {
 //separated function, so it can be called by window event "reload-table" or window onShow
 const loadKBAFile = () => {
   //Load KBA file and send data via kbaData to the extension window
-  fs.readFile("kbas.csv", 'utf8', (err,result)=>{
-    ise.extension.sendEventToWindow("load-kba-file", result);
-  });
+    fs.readFile(path.join(__dirname, "kbas.csv"), 'utf8', (err,result)=>{
+      if(err){
+        //CSV file does not exist, create file
+        fs.writeFile(path.join(__dirname,"kbas.csv"), "", function (err) {
+          if (err) throw err;
+        });
+        ise.extension.sendEventToWindow("load-kba-file", "");
+      }else{
+        ise.extension.sendEventToWindow("load-kba-file", result);
+      }
+    });  
 };
 
 ise.events.onEvent('reload-table',()=>{
@@ -26,5 +35,5 @@ ise.events.onEvent('reload-table',()=>{
 
 ise.events.onEvent('update-csv',(currentKbaData)=>{
   let csvData = currentKbaData.join(";");
-  fs.writeFileSync("./kbas.csv", csvData);
+  fs.writeFileSync(path.join(__dirname, "kbas.csv"), csvData);
 });

@@ -40,6 +40,9 @@
   }
 
    ise.events.onEvent("load-kba-file",(kbaData)=>{
+    //clear new KBA input box and close error
+    document.getElementById("newKbaInput").value = "";
+    document.getElementById("kba-format-error").style.display = "none";
     setKbaTable(kbaData);
    });
 
@@ -95,10 +98,16 @@
       kbaSplit = document.getElementById("newKbaInput").value.split("-");
     }
     
+    if(kbaSplit.length>1){
     //create CSV entry, update CSV file and reload table
     currentKbaData.push(kbaSplit[0]+","+kbaSplit[1]+","+"https://support.wdf.sap.corp/sap/support/notes/"+kbaSplit[0]);
     ise.extension.sendEventToWorker('update-csv',currentKbaData);
     ise.extension.sendEventToWorker('reload-table');
+    document.getElementById("kba-format-error").style.display = "none";
+
+    }else{
+      document.getElementById("kba-format-error").style.display = "block";
+    }
 
     document.getElementById("newKbaInput").value = "";
    }

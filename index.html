@@ -14,14 +14,30 @@
             <table class="table table-hover table-dark align-middle" id="scratchpad-kbas">   
             </table>
 
+            <!--Error for incorrect KBA input-->
+            <div id ="kba-format-error" style="display:none; bottom:7%; margin:1%; position:sticky;" class="alert alert-danger alert-dismissible fade show" role="alert">
+              <button type="button" class="btn btn-outline-danger btn-sm" onclick="this.parentElement.style.display='none';">
+                <span>&times;</span>
+              </button>
+              <strong>Incorrect KBA Input...        </strong>Please enter KBA as "ID - Title"
+            </div>
+
             <!--Add KBA panel-->
             <div class="bg-dark" style="bottom:0%; margin:0%; position:sticky; padding-top:1%; padding-right: 5%; padding-left: 5%;">
               <div class="input-group mb-3">
-                <input type="text" class="form-control bg-light" placeholder="Input a KBA title as '12345 - KBA Title'" id="newKbaInput">
+                <input type="text" class="form-control bg-light" placeholder="Input a KBA entry as '12345 - KBA Title'" id="newKbaInput">
                 <div class="input-group-append">
                   <button class="btn btn-outline-secondary" type="button" onclick="addKba()">Add KBA</button>
                 </div>
               </div>
+            </div>
+
+            <!--Error for incorrect KBA input-->
+            <div id ="kba-format-error" style="display:none;" class="alert alert-danger alert-dismissible fade show" role="alert">
+              <button type="button" class="btn btn-outline-danger" onclick="this.parentElement.style.display='none';">
+                <span>&times;</span>
+              </button>
+              <strong>Incorrect KBA Input...        </strong>Please enter KBA as "ID - Title"
             </div>
 
       </div>

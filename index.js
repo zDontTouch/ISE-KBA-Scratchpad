@@ -19,11 +19,11 @@
 
    function copyKbaLink(id){
     navigator.clipboard.writeText("https://me.sap.com/notes/"+id);
-    //navigator.clipboard.writeText(document.getElementById("kba-name-id-"+id).getAttribute("href"));
    }
 
    function copyKbaIdAndName(id){
-    navigator.clipboard.writeText(document.getElementById("kba-name-id-"+id).innerText);
+    let selectedKBA = currentKbaData[id].split(",");
+    navigator.clipboard.writeText(selectedKBA[0]+" - "+selectedKBA[1]);
    }
 
    async function copyKbaId(id){
@@ -52,14 +52,16 @@
         noKbaDiv.parentElement.removeChild(noKbaDiv);
       }
 
-      //create entries in extension window for each KBA
+      //split CSV
       let kbaRows = kbaData.split(";");
+      //update current KBA data (used for indexes) from file
       currentKbaData = kbaRows;
       let windowKbaTable = document.getElementById("scratchpad-kbas");
       let windowKbaTableContent = document.createElement("table");
       windowKbaTableContent.setAttribute("class","table table-hover table-dark align-middle");
       windowKbaTableContent.setAttribute("id","scratchpad-kbas");
       
+      //create entries in extension window for each KBA
       for(let i=0; i<kbaRows.length; i++){
         let kbaRow = document.createElement("tr");
         kbaRow.setAttribute("id",i);
@@ -75,7 +77,7 @@
 
     }else{
       let windowKbaTable = document.getElementById("windowContent");
-      //remove the "No KBA" div
+      //remove the "No KBA" div if exists
       let noKbaDiv = document.getElementById("no-kba");
       if(noKbaDiv == null){
         windowKbaTable.innerHTML = "<div id=\"no-kba\" align=\"center\">No KBAs</div>"+windowKbaTable.innerHTML;
@@ -88,12 +90,13 @@
    function addKba(){
     //trim and split new KBA string (<kbaid> - <kbaname>)
     let kbaSplit = document.getElementById("newKbaInput").value.trim().split(" - ");
+    //detect if KBA was entered as "X - Y" or "X-Y" ("X - Y" will fail to split into array)
     if(kbaSplit.length<2){
       kbaSplit = document.getElementById("newKbaInput").value.split("-");
     }
     
+    //create CSV entry, update CSV file and reload table
     currentKbaData.push(kbaSplit[0]+","+kbaSplit[1]+","+"https://support.wdf.sap.corp/sap/support/notes/"+kbaSplit[0]);
-    console.log(currentKbaData);
     ise.extension.sendEventToWorker('update-csv',currentKbaData);
     ise.extension.sendEventToWorker('reload-table');
 

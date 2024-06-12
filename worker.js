@@ -12,9 +12,10 @@ ise.window.onShow((show) => {
   }
 });
 
+//separated function, so it can be called by window event "reload-table" or window onShow
 const loadKBAFile = () => {
   //Load KBA file and send data via kbaData to the extension window
-  fs.readFile("./kbas.csv", 'utf8', (err,result)=>{
+  fs.readFile("kbas.csv", 'utf8', (err,result)=>{
     ise.extension.sendEventToWindow("load-kba-file", result);
   });
 };
@@ -26,5 +27,4 @@ ise.events.onEvent('reload-table',()=>{
 ise.events.onEvent('update-csv',(currentKbaData)=>{
   let csvData = currentKbaData.join(";");
   fs.writeFileSync("./kbas.csv", csvData);
-  
 });

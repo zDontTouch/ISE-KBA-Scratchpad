@@ -2,7 +2,7 @@
    ise.extension.initWindow(700);
    ise.window.setMinimumSize(700);
    
-   let currentKbaData;
+   let currentKbaData = [];
 
    /* Intercept clicks which have an href - these should be opened in an ISE tab, not the extension window */
    document.addEventListener("click", (e) => {
@@ -99,6 +99,8 @@
       kbaSplit = document.getElementById("newKbaInput").value.split("-");
     }
     
+    console.log(kbaSplit[0]+","+kbaSplit[1]);
+
     if(kbaSplit.length>1){
     //create CSV entry, update CSV file and reload table
     currentKbaData.push(kbaSplit[0]+","+kbaSplit[1]+","+"https://support.wdf.sap.corp/sap/support/notes/"+kbaSplit[0]);
@@ -112,11 +114,3 @@
 
     document.getElementById("newKbaInput").value = "";
    }
-
-   function snapRight() {
-    ipcRenderer.invoke("engine-extension-snap-right");
-  }
-
-  function closeApp() {
-    ipcRenderer.invoke("engine-window-show", false);
-  }

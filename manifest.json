@@ -2,7 +2,7 @@
     "name": "KBA Scratchpad",
     "description": "Extension to save frequently used KBAs",
     "type": "extension",
-    "icon": "fas cubes",
+    "icon": "fas scroll",
     "global": true,
     "persistent": false
 }

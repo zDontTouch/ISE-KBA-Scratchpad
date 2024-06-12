@@ -1,5 +1,6 @@
 
    ise.extension.initWindow(700);
+   ise.window.setMinimumSize(700);
    
    let currentKbaData;
 
@@ -70,7 +71,7 @@
         kbaRow.setAttribute("id",i);
         
         let kbaRowContent = kbaRows[i].split(",");
-        kbaRow.innerHTML = "<td><button class=\"btn btn-outline-secondary btn-sm\" onclick=\"removeRow("+i+")\"><i class=\"fa fa-trash\"></i></button></td><td><a style=\"text-decoration:none;\" id=\"kba-name-id-"+i+"\" href=\""+kbaRowContent[2]+"\">"+kbaRowContent[0]+" - "+kbaRowContent[1].slice(0,67)+((kbaRowContent[1].length >67) ? "..." : "")+"</a></td><td><button class=\"btn btn-outline-secondary btn-sm\" onclick=\"copyKbaLink("+kbaRowContent[0]+")\"><i class=\"fa-regular fa-copy\"></i>Customer Link</button></td><td><button class=\"btn btn-outline-secondary btn-sm\" onclick=\"copyKbaId("+i+")\"><i class=\"fa-regular fa-copy\"></i>ID</button></td><td><button class=\"btn btn-outline-secondary btn-sm\" onclick=\"copyKbaIdAndName("+i+")\"><i class=\"fa-regular fa-copy\"></i> Copy ID+Name</button></td>"
+        kbaRow.innerHTML = "<td><button class=\"btn btn-outline-secondary btn-sm\" onclick=\"removeRow("+i+")\"><i class=\"fa fa-trash\"></i></button></td><td><a style=\"text-decoration:none;\" id=\"kba-name-id-"+i+"\" title=\""+kbaRowContent[1]+"\" href=\""+kbaRowContent[2]+"\">"+kbaRowContent[0]+" - "+kbaRowContent[1].slice(0,67)+((kbaRowContent[1].length >67) ? "..." : "")+"</a></td><td><button class=\"btn btn-outline-secondary btn-sm\" onclick=\"copyKbaLink("+kbaRowContent[0]+")\"><i class=\"fa-regular fa-copy\"></i>Customer Link</button></td><td><button class=\"btn btn-outline-secondary btn-sm\" onclick=\"copyKbaId("+i+")\"><i class=\"fa-regular fa-copy\"></i>ID</button></td><td><button class=\"btn btn-outline-secondary btn-sm\" onclick=\"copyKbaIdAndName("+i+")\"><i class=\"fa-regular fa-copy\"></i> Copy ID+Name</button></td>"
         
         windowKbaTableContent.appendChild(kbaRow);
         
@@ -111,3 +112,11 @@
 
     document.getElementById("newKbaInput").value = "";
    }
+
+   function snapRight() {
+    ipcRenderer.invoke("engine-extension-snap-right");
+  }
+
+  function closeApp() {
+    ipcRenderer.invoke("engine-window-show", false);
+  }

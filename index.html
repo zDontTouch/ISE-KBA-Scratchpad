@@ -4,12 +4,21 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" type="text/css" href="index.css" />
-    <link rel="stylesheet" type="text/css" href="./bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="./lib/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="./lib/bootstrap-reboot.css" />
+    <link rel="stylesheet" type="text/css" href="./lib/animate.css" />
+    <!--Override Bootstrap dark hover table colors to ISE colors-->
+    <style>
+      .table {
+        --bs-table-bg: var(--background2);
+        --bs-table-hover-bg: rgba(103, 103, 103, 0.126);
+      }
+  </style>
     <script src="index.js" ></script>
   </head>
   <body>
 
-    <div class="ise-extension bg-dark">
+    <div class="ise-extension" style="background: var(--background2);">
       <div class="ise-extension-content" id="windowContent">
 
             <!--Table to be filled from CSV-->
@@ -25,7 +34,7 @@
             </div>
 
             <!--Add KBA panel-->
-            <div class="bg-dark" style="bottom:0%; margin:0%; position:sticky; padding-top:1%; padding-right: 5%; padding-left: 5%;">
+            <div style="background: var(--background2); bottom:0%; margin:0%; position:sticky; padding-top:1%; padding-right: 5%; padding-left: 5%;">
               <div class="input-group mb-3">
                 <input type="text" class="form-control bg-light" placeholder="Input a KBA entry as '12345 - KBA Title'" id="newKbaInput">
                 <div class="input-group-append">

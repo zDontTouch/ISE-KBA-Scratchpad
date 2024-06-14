@@ -1,6 +1,6 @@
 {
     "name": "KBA Scratchpad",
-    "description": "Extension to save frequently used KBAs",
+    "description": "Extension to save, access and reference frequently used KBAs",
     "type": "extension",
     "icon": "fas scroll",
     "global": true,

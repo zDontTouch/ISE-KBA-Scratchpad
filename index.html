@@ -22,6 +22,22 @@
   <div class="ise-extension" style="background: var(--background2);">
     <div class="ise-extension-content" id="windowContent">
             
+      <!--Reordering-->
+      <div clss="bg-econdary">
+          <button type="button" style="float: right; margin-top: 1%; margin-right: 2%;" class="btn btn-outline-secondary btn-sm dropbtn" onclick="toggleReorder()"20><span class="iconSort" title="Reorder KBAs"></span></button>
+          <div class="dropdown" style="float: left; margin-left: 2%; margin-top: 1%;">
+          <button type="button" id="fileMenu" class="btn btn-outline-secondary btn-sm" onclick="menuDropdown()"><span class="iconMenu" title="Import KBA File"></span></button>
+            <div id="menuDropdown" class="dropdown-content">
+            <!--Import-->
+            <button style="width: 210px; background-color: var(--background2);" type="button" id="importCsv" class="btn btn-outline-secondary btn-sm dropbtn" onclick="importCsvFile()"><div style="float: left;"><span style="margin-right: 15%; float: left;" class="iconImport" title="Import KBA File"></span>Import KBA File</div></button>
+            <!--Export-->
+            <button style="width: 210px; background-color: var(--background2);" type="button" id="exportCsv" class="btn btn-outline-secondary btn-sm dropbtn" onclick="exportCsvFile()"><div style="float: left;"><span style="margin-right: 15%;" class="iconExport" title="Export KBA File"></span>Export KBA File</div></button>
+            <!--Reset File to zero-->
+            <button style="width: 210px; background-color: var(--background2);" type="button" id="exportCsv" class="btn btn-outline-secondary btn-sm dropbtn" onclick="resetCsvFile()"><div style="float: left;"><span style="margin-right: 10.7%;" class="iconRefresh" title="Export KBA File"></span>Reset KBA File to Empty</div></button>
+            </div>
+          </div>
+      </div>
+
       <!--Table to be filled from CSV-->
       <table class="table table-hover table-dark align-middle" id="scratchpad-kbas">   
       </table>
@@ -37,22 +53,11 @@
       
       <div style="background: var(--background2); bottom:0%; margin:0%; position:sticky; padding-top:1%; padding-right: 5%; padding-left: 5%;">
         <div class="input-group mb-3">
-          <!--Menu button and dropdown-->
-          <!--<div class="dropdown">
-          <button type="button" style="margin-right: 4%; margin-left: -4%; border-radius: 4px;" class="btn btn-outline-secondary btn-sm dropbtn" onclick="menuDropdown()"><span class="menuIcon"></span></button>
-          <div id="menuDropdown" class="dropdown-content">
-            <a class="list-group-item list-group-item-action bg-secondary" href="#">Reorder KBAs</a>
-            <a class="list-group-item list-group-item-action bg-secondary" href="#">Import KBA file</a>
-            <a class="list-group-item list-group-item-action bg-secondary" href="#">Export KBA file</a>
-            <a class="list-group-item list-group-item-action bg-secondary" href="#">Settings</a>
-          </div>
-          </div>-->
-
-          <!--Test reordering-->
-          <button type="button" style="margin-right: 4%; margin-left: -4%; border-radius: 4px;" class="btn btn-outline-secondary btn-sm dropbtn" onclick="toggleReorder()"><span class="menuIcon"></span></button>
-
           <!--"Add KBA" panel-->
-          <input type="text" class="form-control bg-light" placeholder="Input a KBA entry as '12345 - KBA Title'" id="newKbaInput">
+     
+
+          
+          <input style="margin-left: 1%;" type="text" class="form-control bg-light" placeholder="Input a KBA entry as '12345 - KBA Title'" id="newKbaInput">
           <div class="input-group-append">
             <button class="btn btn-outline-secondary" type="button" onclick="addKba()">Add KBA</button>
           </div>

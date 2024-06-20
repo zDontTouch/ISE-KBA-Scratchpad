@@ -37,3 +37,14 @@ ise.events.onEvent('update-csv',(currentKbaData)=>{
   let csvData = currentKbaData.join(";");
   fs.writeFileSync(path.join(__dirname, "kbas.csv"), csvData);
 });
+
+//Send __dirname to page JS
+ise.events.onEvent('get-dir-path',()=>{
+  ise.extension.sendEventToWindow("receive-dir-path", __dirname);
+});
+
+ise.events.onEvent('reset-csv',()=>{
+  fs.writeFile(path.join(__dirname,"kbas.csv"), "", function (err) {
+    if (err) throw err;
+  });
+});

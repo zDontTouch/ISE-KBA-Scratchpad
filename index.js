@@ -4,30 +4,21 @@
    
    let currentKbaData = [];
    let isReorderActive = false;
+   let extensionDirectory = "";
 
    /* Intercept clicks which have an href - these should be opened in an ISE tab, not the extension window */
    document.addEventListener("click", (e) => {
      e.preventDefault(); /* Stop the default action */
+
      if (e.target?.href) {
        /* If the href starts with file: then it was a relative URL (usually starting with /)
           repoint it to https://items.services.sap */
        const url = e.target.href.startsWith("file:")
-         ? "https://itsm.services.sap" + e.target.attributes.href.nodeValue
+         ? e.target.attributes.href.nodeValue
          : e.target.href;
        /* Open the URL as an ISE tab in the foreground (show:true) */
        ise.tab.add(url, { show: true });
      }
-
-     //close dropdown menu when clicking outside of it
-     if (!e.target.matches('.dropbtn') && !e.target.matches(".menuIcon")) {
-      var dropdown = document.getElementById("menuDropdown");
-      try{
-        dropdown.classList.remove("show");
-      }catch(err){
-
-      }
-    }
-
    });
 
    function copyKbaLink(id){
@@ -39,7 +30,7 @@
     navigator.clipboard.writeText(selectedKBA[0]+" - "+selectedKBA[1]);
    }
 
-   async function copyKbaId(id){
+   function copyKbaId(id){
     navigator.clipboard.writeText(document.getElementById("kba-name-id-"+id).innerText.split(" ")[0]);
    }
 
@@ -54,10 +45,18 @@
   }
 
    ise.events.onEvent("load-kba-file",(kbaData)=>{
+    //Update extension directory for import/export functions
+    ise.extension.sendEventToWorker('get-dir-path');
+
     //clear new KBA input box and close error
     document.getElementById("newKbaInput").value = "";
     document.getElementById("kba-format-error").style.display = "none";
     setKbaTable(kbaData);
+    if(isReorderActive){
+      //if the reorder commands were being displayed before the reload, set the flag to false to retrigger them
+      isReorderActive = false;
+      toggleReorder();
+    }
    });
 
    function setKbaTable(kbaData){
@@ -143,7 +142,7 @@
           let reorderButtonDown = document.createElement("button");
 
           //set container
-          reorderButtonsDiv.setAttribute("style","heigth:100%;");
+          reorderButtonsDiv.setAttribute("style","heigth:90%;");
 
           //set buttons
           reorderButtonUp.innerHTML = "↑";
@@ -190,8 +189,33 @@
 
     ise.extension.sendEventToWorker('update-csv',currentKbaData);
     ise.extension.sendEventToWorker('reload-table');
-    //reloading table removes the reorder elements, this syncs the state and toggles back reordering
-    isReorderActive = false;
-    toggleReorder();
+   }
 
+   //Request __dirname from worker
+   ise.events.onEvent("receive-dir-path", (dirPath) => {
+    extensionDirectory = dirPath;
+   });
+
+   function exportCsvFile(){
+    //update current extension directory
+    const a = document.createElement('a');
+    a.href = "file:"+extensionDirectory + "/kbas.csv";
+    a.download = "kbas.csv";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+   }
+
+   function importCsvFile(){
+    var input = document.createElement('input');
+    input.type = 'file';
+    input.click();
+   }
+
+   function resetCsvFile(){
+    ise.extension.sendEventToWorker('reset-csv');
+    currentKbaData = [];
+    let kbaTable = document.getElementById("scratchpad-kbas");
+    kbaTable.innerHTML = "";
+    ise.extension.sendEventToWorker('reload-table');
    }

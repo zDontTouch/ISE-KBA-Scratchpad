@@ -3,7 +3,10 @@
    ise.window.setMinimumSize(750);
    
    let currentKbaData = [];
+   let importKbaData = [];
    let isReorderActive = false;
+   let isAddKbaInputActive = false;
+   let isMenuActive = false;
    let extensionDirectory = "";
 
    /* Intercept clicks which have an href - these should be opened in an ISE tab, not the extension window */
@@ -20,6 +23,19 @@
        ise.tab.add(url, { show: true });
      }
    });
+
+   document.addEventListener("keypress", function(event) {
+    // If the user presses the "Enter" key on the keyboard
+    if (event.key === "Enter") {
+      // Cancel the default action, if needed
+      event.preventDefault();
+      if(document.activeElement.id == "newKbaInput"){
+        addKba();
+      }else{
+        
+      }
+    }
+  });
 
    function copyKbaLink(id){
     navigator.clipboard.writeText("https://me.sap.com/notes/"+id);
@@ -57,6 +73,15 @@
       isReorderActive = false;
       toggleReorder();
     }
+
+    if(isAddKbaInputActive){
+      toggleAddKba();      
+    }
+
+    if(isMenuActive){
+      menuDropdown();
+    }
+
    });
 
    function setKbaTable(kbaData){
@@ -111,6 +136,13 @@
       kbaSplit = document.getElementById("newKbaInput").value.split("-");
     }
 
+    //prevent issues if KBA title contains "-"
+    if(kbaSplit.length>2){
+      for(let i=2; i<kbaSplit.length; i++){
+        kbaSplit[1] = kbaSplit[1]+" - "+kbaSplit[i];
+      }
+    }
+
     if(kbaSplit.length>1){
     //create CSV entry, update CSV file and reload table
     currentKbaData.push(kbaSplit[0]+","+kbaSplit[1]+","+"https://support.wdf.sap.corp/sap/support/notes/"+kbaSplit[0]);
@@ -128,6 +160,11 @@
 
    function menuDropdown(){
     document.getElementById("menuDropdown").classList.toggle("show");
+    if(isMenuActive){
+      isMenuActive = false;
+    }else{
+      isMenuActive = true;
+    }
    }
 
    function toggleReorder(){
@@ -206,11 +243,45 @@
     document.body.removeChild(a);
    }
 
+   ise.events.onEvent("update-import-file", (result) => {
+    if(result != "error"){
+      importCsvFile = result;
+    }else{
+      document.getElementById("kba-format-error").style.display = "block";
+    }
+   });
+   //ISSUE: IMPORT BUTTON ONLY WORKS ONE TIME
    function importCsvFile(){
+    importCsvFile = [];
     var input = document.createElement('input');
+    input.setAttribute("accept",".csv");
     input.type = 'file';
     input.click();
+
+    //catch path of the file selected
+    input.onchange = e => { 
+      //send path to worker to load the file
+      console.log("reading from: "+e.target.files[0].path);
+      ise.extension.sendEventToWorker('read-import-file', e.target.files[0].path);
+      setTimeout(() => {
+        console.log("Loaded content: "+importCsvFile);
+        let kbaRows = importCsvFile.split(";");
+      for(let i=0; i<kbaRows.length;i++){
+        let kbaEntry = kbaRows[i].split(",");
+        console.log(kbaRows[1]);
+        if(kbaEntry.length==3){
+          currentKbaData.push(kbaEntry[0]+","+kbaEntry[1]+","+kbaEntry[2]);
+        }else{
+          document.getElementById("kba-format-error").style.display = "block";
+        }
+      }
+      ise.extension.sendEventToWorker('update-csv',currentKbaData);
+      ise.extension.sendEventToWorker('reload-table');
+      document.getElementById("kba-format-error").style.display = "none";
+      }, 1000); 
+    } 
    }
+
 
    function resetCsvFile(){
     ise.extension.sendEventToWorker('reset-csv');
@@ -218,4 +289,19 @@
     let kbaTable = document.getElementById("scratchpad-kbas");
     kbaTable.innerHTML = "";
     ise.extension.sendEventToWorker('reload-table');
+   }
+
+   function toggleAddKba(){
+    let tab = document.getElementById("addKbaTab");
+    let kbaInput = document.getElementById("addKbaInput");
+    if(!isAddKbaInputActive){
+      tab.setAttribute("style","bottom:7.5%;");
+      kbaInput.setAttribute("style","display:block;");
+      isAddKbaInputActive = true;
+    }else{
+      tab.setAttribute("style","bottom:0%;");
+      kbaInput.setAttribute("style","display:none;");
+      isAddKbaInputActive = false;
+    }
+    
    }

@@ -21,12 +21,14 @@
   
   <div class="ise-extension" style="background: var(--background2);">
     <div class="ise-extension-content" id="windowContent">
-            
-      <!--Reordering-->
-      <div clss="bg-econdary">
-          <button type="button" style="float: right; margin-top: 1%; margin-right: 2%;" class="btn btn-outline-secondary btn-sm dropbtn" onclick="toggleReorder()"20><span class="iconSort" title="Reorder KBAs"></span></button>
-          <div class="dropdown" style="float: left; margin-left: 2%; margin-top: 1%;">
-          <button type="button" id="fileMenu" class="btn btn-outline-secondary btn-sm" onclick="menuDropdown()"><span class="iconMenu" title="Import KBA File"></span></button>
+
+
+      <div style="background: var(--background2); top: 0%; padding-bottom:1%; position:sticky; padding-top:1%; padding-right: 5%; padding-left: 5%;">
+        <div class="input-group mb-3">
+          <!--Search KBA and menu panel--> 
+          <div class="input-group-append">
+            <button type="button" id="fileMenu" class="btn btn-outline-secondary btn-sm" onclick="menuDropdown()"><span class="iconMenu" title="Import KBA File"></span></button>
+            <div class="dropdown">
             <div id="menuDropdown" class="dropdown-content">
             <!--Import-->
             <button style="width: 210px; background-color: var(--background2);" type="button" id="importCsv" class="btn btn-outline-secondary btn-sm dropbtn" onclick="importCsvFile()"><div style="float: left;"><span style="margin-right: 15%; float: left;" class="iconImport" title="Import KBA File"></span>Import KBA File</div></button>
@@ -35,13 +37,30 @@
             <!--Reset File to zero-->
             <button style="width: 210px; background-color: var(--background2);" type="button" id="exportCsv" class="btn btn-outline-secondary btn-sm dropbtn" onclick="resetCsvFile()"><div style="float: left;"><span style="margin-right: 10.7%;" class="iconRefresh" title="Export KBA File"></span>Reset KBA File to Empty</div></button>
             </div>
+            </div>
+          </div>  
+          <input type="text" class="form-control bg-light" placeholder="Search in KBA title or ID" id="searchInput">
+          <div class="input-group-append">
+            <button type="button" style="float: right; margin-top: 1%; margin-right: 2%;" class="btn btn-outline-secondary btn-sm dropbtn" onclick="toggleReorder()"20><span class="iconSort" title="Reorder KBAs"></span></button>
           </div>
+        </div>
       </div>
+
 
       <!--Table to be filled from CSV-->
       <table class="table table-hover table-dark align-middle" id="scratchpad-kbas">   
       </table>
       
+      
+      
+      <!--Add KBA tab-->
+      <button class="btn-secondary addKbaTab shadow-none" id="addKbaTab" onclick="toggleAddKba()">
+        <p style="margin-top: -1%;">Add KBA</p>
+      </button>
+      <div id="addKbaInput" class="bg-secondary addKbaInput">
+        <input type="text" class="form-control bg-light" placeholder="Input a KBA entry as '12345 - KBA Title' and press Enter" id="newKbaInput">
+      </div>
+
       <!--Error for incorrect KBA input-->
       <div id ="kba-format-error" style="display:none; bottom:7%; margin:1%; position:sticky;" class="alert alert-danger alert-dismissible fade show" role="alert">
         <button type="button" class="btn btn-outline-danger btn-sm" onclick="this.parentElement.style.display='none';">
@@ -49,29 +68,7 @@
         </button>
         <strong>Incorrect KBA Input...        </strong>Please enter KBA as "ID - Title"
       </div>
-      
-      
-      <div style="background: var(--background2); bottom:0%; margin:0%; position:sticky; padding-top:1%; padding-right: 5%; padding-left: 5%;">
-        <div class="input-group mb-3">
-          <!--"Add KBA" panel-->
-     
-
-          
-          <input style="margin-left: 1%;" type="text" class="form-control bg-light" placeholder="Input a KBA entry as '12345 - KBA Title'" id="newKbaInput">
-          <div class="input-group-append">
-            <button class="btn btn-outline-secondary" type="button" onclick="addKba()">Add KBA</button>
-          </div>
-        </div>
-      </div>
-      
-      <!--Error for incorrect KBA input-->
-      <div id ="kba-format-error" style="display:none;" class="alert alert-danger alert-dismissible fade show" role="alert">
-        <button type="button" class="btn btn-outline-danger" onclick="this.parentElement.style.display='none';">
-          <span>&times;</span>
-        </button>
-        <strong>Incorrect KBA Input...        </strong>Please enter KBA as "ID - Title"
-      </div>
-      
+         
     </div>
   </div>
 </body>

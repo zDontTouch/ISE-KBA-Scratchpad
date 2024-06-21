@@ -48,3 +48,13 @@ ise.events.onEvent('reset-csv',()=>{
     if (err) throw err;
   });
 });
+
+ise.events.onEvent('read-import-file',(path)=>{
+  fs.readFile(path, 'utf8', (err,result)=>{
+    if(err){
+      ise.extension.sendEventToWindow("update-import-file", "error");
+    }else{
+      ise.extension.sendEventToWindow("update-import-file", result);
+    }
+  });  
+});

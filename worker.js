@@ -10,6 +10,8 @@ let kbaData ={};
 ise.window.onShow((show) => {
   if (show){
     loadKBAFile();    
+  } else {
+    ise.extension.sendEventToWindow("close-popups");
   }
 });
 
@@ -34,7 +36,7 @@ ise.events.onEvent('reload-table',()=>{
 });
 
 ise.events.onEvent('update-csv',(currentKbaData)=>{
-  let csvData = currentKbaData.join(";");
+  let csvData = currentKbaData.join("||");
   fs.writeFileSync(path.join(__dirname, "kbas.csv"), csvData);
 });
 

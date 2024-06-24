@@ -3,7 +3,9 @@
    ise.window.setMinimumSize(750);
    
    let currentKbaData = [];
+   let currentKbaDataBuffer = [];
    let importKbaData = [];
+   let searchedKbaData = [];
    let isReorderActive = false;
    let isAddKbaInputActive = false;
    let isMenuActive = false;
@@ -32,7 +34,9 @@
       if(document.activeElement.id == "newKbaInput"){
         addKba();
       }else{
-        
+        isAddKbaInputActive = false;
+        toggleAddKba();
+        document.getElementById("newKbaInput").focus();
       }
     }
   });
@@ -42,7 +46,7 @@
    }
 
    function copyKbaIdAndName(id){
-    let selectedKBA = currentKbaData[id].split(",");
+    let selectedKBA = currentKbaData[id].split("█");
     navigator.clipboard.writeText(selectedKBA[0]+" - "+selectedKBA[1]);
    }
 
@@ -67,10 +71,17 @@
     //clear new KBA input box and close error
     document.getElementById("newKbaInput").value = "";
     document.getElementById("kba-format-error").style.display = "none";
+    currentKbaDataBuffer = kbaData;
     setKbaTable(kbaData);
+    //if the reorder commands were being displayed before the reload, set the flag to false to retrigger them (as the reload will clear the table HTML)
     if(isReorderActive){
-      //if the reorder commands were being displayed before the reload, set the flag to false to retrigger them
       isReorderActive = false;
+      toggleReorder();
+    }
+  });
+
+   ise.events.onEvent("close-popups",()=>{
+    if(isReorderActive){
       toggleReorder();
     }
 
@@ -81,7 +92,6 @@
     if(isMenuActive){
       menuDropdown();
     }
-
    });
 
    function setKbaTable(kbaData){
@@ -94,7 +104,7 @@
       }
 
       //split CSV
-      let kbaRows = kbaData.split(";");
+      let kbaRows = kbaData.split("||");
       //update current KBA data (used for indexes) from file
       currentKbaData = kbaRows;
       let windowKbaTable = document.getElementById("scratchpad-kbas");
@@ -107,7 +117,7 @@
         let kbaRow = document.createElement("tr");
         kbaRow.setAttribute("id",i);
         
-        let kbaRowContent = kbaRows[i].split(",");
+        let kbaRowContent = kbaRows[i].split("█");
         kbaRow.innerHTML = "<td><button id=\"btn-delete-"+i+"\" class=\"btn btn-outline-secondary btn-sm\" onclick=\"removeRow("+i+")\"><span class=\"iconTrash\"></span></button></td><td><a style=\"text-decoration:none;\" id=\"kba-name-id-"+i+"\" title=\""+kbaRowContent[1]+"\" href=\""+kbaRowContent[2]+"\">"+kbaRowContent[0]+" - "+kbaRowContent[1].slice(0,67)+((kbaRowContent[1].length >67) ? "..." : "")+"</a></td><td><button class=\"btn btn-outline-secondary btn-sm\" onclick=\"copyKbaLink("+kbaRowContent[0]+")\"><span class=\"iconCopy\"></span><br> Ext. Link</button></td><td><button class=\"btn btn-outline-secondary btn-sm\" onclick=\"copyKbaId("+i+")\"><span class=\"iconCopy\"></span><br> KBA ID</button></td><td><button class=\"btn btn-outline-secondary btn-sm\" onclick=\"copyKbaIdAndName("+i+")\"><span class=\"iconCopy\"></span><br>ID+Name</button></td>"
         
         windowKbaTableContent.appendChild(kbaRow);
@@ -145,7 +155,7 @@
 
     if(kbaSplit.length>1){
     //create CSV entry, update CSV file and reload table
-    currentKbaData.push(kbaSplit[0]+","+kbaSplit[1]+","+"https://support.wdf.sap.corp/sap/support/notes/"+kbaSplit[0]);
+    currentKbaData.push(kbaSplit[0]+"█"+kbaSplit[1]+"█"+"https://support.wdf.sap.corp/sap/support/notes/"+kbaSplit[0]);
     ise.extension.sendEventToWorker('update-csv',currentKbaData);
     ise.extension.sendEventToWorker('reload-table');
     document.getElementById("kba-format-error").style.display = "none";
@@ -168,42 +178,43 @@
    }
 
    function toggleReorder(){
+      if(currentKbaData.length!=0){
+        if(!isReorderActive){
+          let kbaTable = document.getElementById("scratchpad-kbas").rows;
+          let i;
+          for (i=0; i<kbaTable.length; i++){
+            //create container and reorder buttons
+            let reorderButtonsDiv = document.createElement("div");
+            let reorderButtonUp = document.createElement("button");
+            let reorderButtonDown = document.createElement("button");
 
-      if(isReorderActive == false){
-        let kbaTable = document.getElementById("scratchpad-kbas").rows;
-        let i;
-        for (i=0; i<kbaTable.length; i++){
-          //create container and reorder buttons
-          let reorderButtonsDiv = document.createElement("div");
-          let reorderButtonUp = document.createElement("button");
-          let reorderButtonDown = document.createElement("button");
+            //set container
+            reorderButtonsDiv.setAttribute("style","heigth:90%;");
 
-          //set container
-          reorderButtonsDiv.setAttribute("style","heigth:90%;");
+            //set buttons
+            reorderButtonUp.innerHTML = "↑";
+            reorderButtonDown.innerHTML = "↓";
+            
+            reorderButtonUp.setAttribute("class","btn btn-outline-light btn-sm");
+            reorderButtonUp.setAttribute("style","margin-bottom:2%;");
+            reorderButtonDown.setAttribute("class","btn btn-outline-light btn-sm");
+            reorderButtonDown.setAttribute("style","margin-top:2%;");
 
-          //set buttons
-          reorderButtonUp.innerHTML = "↑";
-          reorderButtonDown.innerHTML = "↓";
-          
-          reorderButtonUp.setAttribute("class","btn btn-outline-light btn-sm");
-          reorderButtonUp.setAttribute("style","margin-bottom:2%;");
-          reorderButtonDown.setAttribute("class","btn btn-outline-light btn-sm");
-          reorderButtonDown.setAttribute("style","margin-top:2%;");
+            reorderButtonUp.setAttribute("onclick","reorder("+i+",\"up\")");
+            reorderButtonDown.setAttribute("onclick","reorder("+i+",\"down\")");
 
-          reorderButtonUp.setAttribute("onclick","reorder("+i+",\"up\")");
-          reorderButtonDown.setAttribute("onclick","reorder("+i+",\"down\")");
+            //append to container
+            reorderButtonsDiv.appendChild(reorderButtonUp);
+            reorderButtonsDiv.appendChild(reorderButtonDown);
 
-          //append to container
-          reorderButtonsDiv.appendChild(reorderButtonUp);
-          reorderButtonsDiv.appendChild(reorderButtonDown);
-
-          kbaTable[i].appendChild(reorderButtonsDiv);
+            kbaTable[i].appendChild(reorderButtonsDiv);
+          }
+          isReorderActive = true;
+        }else{
+          ise.extension.sendEventToWorker('update-csv',currentKbaData);
+          ise.extension.sendEventToWorker('reload-table');
+          isReorderActive = false;
         }
-        isReorderActive = true;
-      }else{
-        ise.extension.sendEventToWorker('update-csv',currentKbaData);
-        ise.extension.sendEventToWorker('reload-table');
-        isReorderActive = false;
       }
    }
 
@@ -245,14 +256,14 @@
 
    ise.events.onEvent("update-import-file", (result) => {
     if(result != "error"){
-      importCsvFile = result;
+      importedCsvFile = result;
     }else{
       document.getElementById("kba-format-error").style.display = "block";
     }
    });
-   //ISSUE: IMPORT BUTTON ONLY WORKS ONE TIME
+   //ISSUE: IMPORT BUTTON ONLY WORKS FOR THE FIRST TIME
    function importCsvFile(){
-    importCsvFile = [];
+    importedCsvFile = [];
     var input = document.createElement('input');
     input.setAttribute("accept",".csv");
     input.type = 'file';
@@ -264,13 +275,13 @@
       console.log("reading from: "+e.target.files[0].path);
       ise.extension.sendEventToWorker('read-import-file', e.target.files[0].path);
       setTimeout(() => {
-        console.log("Loaded content: "+importCsvFile);
-        let kbaRows = importCsvFile.split(";");
+        console.log("Loaded content: "+importedCsvFile);
+        let kbaRows = importedCsvFile.split("||");
       for(let i=0; i<kbaRows.length;i++){
-        let kbaEntry = kbaRows[i].split(",");
+        let kbaEntry = kbaRows[i].split("█");
         console.log(kbaRows[1]);
         if(kbaEntry.length==3){
-          currentKbaData.push(kbaEntry[0]+","+kbaEntry[1]+","+kbaEntry[2]);
+          currentKbaData.push(kbaEntry[0]+"█"+kbaEntry[1]+"█"+kbaEntry[2]);
         }else{
           document.getElementById("kba-format-error").style.display = "block";
         }
@@ -305,3 +316,30 @@
     }
     
    }
+
+  
+  function searchKba(searchTerm){
+    searchedKbaData = [];   
+    //reset the KBA table before each search (in case user deletes a char from search, the search will re-search from all the list)
+    setKbaTable(currentKbaDataBuffer);
+    //if search box gets empty, the full list is displayed
+    if(searchTerm != ""){
+      for(let i=0;i<currentKbaData.length;i++){
+        let currentKbaRow = currentKbaData[i].split("█");
+        //using Regex for case insensitive search
+        if(currentKbaRow[1].toString().toLowerCase().indexOf(searchTerm.toString().toLowerCase()) >= 0 || currentKbaRow[0].toString().indexOf(searchTerm.toString()) >= 0){
+          searchedKbaData.push(currentKbaData[i]);
+        }else{
+        }
+      }
+      //if there are no results, search does nothing
+      if(searchedKbaData.length!=0){
+        setKbaTable(searchedKbaData.join("||"));
+      }else{
+
+      }
+      
+    }else{
+      ise.extension.sendEventToWorker('reload-table');
+    }
+  }

@@ -61,10 +61,10 @@
     
     ise.extension.sendEventToWorker('update-csv',currentKbaData);
     ise.extension.sendEventToWorker('reload-table');
-    //isReorderActive = false;
   }
 
    ise.events.onEvent("load-kba-file",(kbaData)=>{
+
     //Update extension directory for import/export functions
     ise.extension.sendEventToWorker('get-dir-path');
 
@@ -178,6 +178,10 @@
    }
 
    function toggleReorder(){
+
+    //Does not allow reordering while list is reduced by searching
+    if(document.getElementById("searchInput").value == ""){
+
       if(currentKbaData.length!=0){
         if(!isReorderActive){
           let kbaTable = document.getElementById("scratchpad-kbas").rows;
@@ -216,6 +220,7 @@
           isReorderActive = false;
         }
       }
+    }
    }
 
    function reorder(id,direction){
@@ -319,6 +324,10 @@
 
   
   function searchKba(searchTerm){
+    //Deactivate reordering, as it breaks the list while searching
+    if(isReorderActive){
+      toggleReorder();
+    }
     searchedKbaData = [];   
     //reset the KBA table before each search (in case user deletes a char from search, the search will re-search from all the list)
     setKbaTable(currentKbaDataBuffer);

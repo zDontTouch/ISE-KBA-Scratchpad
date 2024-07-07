@@ -72,6 +72,16 @@ body {
 
   .show {display:block;}
 
+  .iconEnter {
+    width: 17px;
+	  height: 17px;
+	  background-size: cover;
+	  background-repeat: no-repeat;
+    vertical-align: text-bottom;
+	  display: inline-block;
+	  background-image:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAWBAMAAAA2mnEIAAAAG1BMVEUAAAD////////w8PDv7/Hw8PHv7/Hv8PHv8PHv0kIUAAAACHRSTlMAAwQRkZWzuy1h370AAAABYktHRAH/Ai3eAAAAPElEQVQY02NgIBJwdABBA5QNIhBsDrLYIAPhbKgUlM3ogGCbNyDYGSAtCHEGGJspAMFmgLkN7GCEmwkAACRqFDr6KeYQAAAAAElFTkSuQmCC');
+  }
+
   .iconVersion {
     width: 15px;
 	  height: 15px;

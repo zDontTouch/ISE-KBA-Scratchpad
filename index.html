@@ -20,10 +20,21 @@
 <body>
   
   <div class="ise-extension" style="background: var(--background2);">
+
+    <div class="ise-extension-header">
+      <div id="currentCase" style="margin-top: 4.5%; margin-left: 25%;">Active Case: N/A</div>
+    </div>
+
     <div class="ise-extension-content" id="windowContent">
 
 
       <div style="background: var(--background2); top: 0%; padding-bottom:1%; position:sticky; padding-top:1%; padding-right: 5%; padding-left: 5%;">
+        <div id ="backup-detect" style="display:none; margin:1%; position:sticky;" class="alert alert-dark alert-dismissible fade show" role="alert">
+          <button type="button" class="btn btn-outline-secondary btn-sm" onclick="this.parentElement.style.display='none';">
+            <span>&times;</span>
+          </button>
+          Backup file loaded automatically since no existing KBA list was detected <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(generally this happens when a new version of the extension is released)
+        </div>
         <div class="input-group mb-3">
           <!--Search KBA and menu panel--> 
           <div class="input-group-append">
@@ -37,7 +48,7 @@
             <!--Reset File to zero-->
             <button style="width: 210px; background-color: var(--background2);" type="button" id="exportCsv" class="btn btn-outline-secondary btn-sm dropbtn" onclick="resetCsvFile()"><div style="float: left;"><span style="margin-right: 10.7%;" class="iconRefresh" title="Export KBA File"></span>Reset KBA File to Empty</div></button>
             <!--version info-->
-            <button style="width: 210px; background-color: var(--background2);" type="button" id="exportCsv" class="btn btn-outline-secondary btn-sm dropbtn"><div style="float: left;"><span style="margin-right: 10.7%;" class="iconVersion" title="Export KBA File"></span>Version: 1.1.1</div></button>
+            <button style="width: 210px; background-color: var(--background2);" type="button" id="exportCsv" class="btn btn-outline-secondary btn-sm dropbtn" onclick="openPatchNotes()"><div style="float: left;"><span style="margin-right: 10.7%;" class="iconVersion" title="Export KBA File"></span>Version: 1.2</div></button>
             </div>
             </div>
           </div>  
@@ -57,7 +68,8 @@
       
       <!--Add KBA tab-->
       <button class="btn-secondary addKbaTab shadow-none" id="addKbaTab" onclick="toggleAddKba()">
-        <p style="margin-top: -1%;">Add KBA</p>
+        <small style="margin-top: -10%;">Add KBA&nbsp;<span class="iconEnter"></span></small>
+        
       </button>
       <div id="addKbaInput" class="bg-secondary addKbaInput">
         <input type="text" class="form-control bg-light" placeholder="Input a KBA entry as '12345 - KBA Title' and press Enter" id="newKbaInput">
@@ -68,7 +80,7 @@
         <button type="button" class="btn btn-outline-danger btn-sm" onclick="this.parentElement.style.display='none';">
           <span>&times;</span>
         </button>
-        <strong>Incorrect KBA Input...        </strong>Please enter KBA as "ID - Title"
+        <strong>Incorrect KBA Input...&nbsp;&nbsp;</strong>Please enter KBA as "ID - Title"
       </div>
          
     </div>

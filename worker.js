@@ -4,12 +4,17 @@ const fs = require("fs");
 const path = require("path");
 
 let kbaData ={};
+let downloadPath = "";
 
 // Handle events for the extension window
 // ise.window.onShow is called whenever the extension window is opened or closed
 ise.window.onShow((show) => {
-  if (show){
-    loadKBAFile();    
+  checkBackupFile();
+  if (show){ 
+    ise.download.getPath().then((downloadDir)=>{
+      downloadPath = downloadDir;
+    });
+    loadKBAFile();   
   } else {
     ise.extension.sendEventToWindow("close-popups");
   }
@@ -30,6 +35,105 @@ const loadKBAFile = () => {
       }
     });  
 };
+
+ise.events.onEvent('update-backup-file',()=>{
+  checkBackupFile();
+});
+
+
+const checkBackupFile = () => {
+
+  let localFileExists;
+  let backupFileExists;
+  
+    //Check if local file exists
+  fs.readFile(path.join(__dirname, "kbas.csv"), 'utf8', (err,result)=>{
+    ise.extension.sendEventToWindow("log","tried to read local");
+    if(err){
+      ise.extension.sendEventToWindow("log","local: "+err);
+      localFileExists = false;
+    }else{
+      localFileExists = true;
+    }
+  });
+
+  setTimeout(() => {
+      //Check if backup file exists
+  fs.readFile(path.join(downloadPath, "ise_scratchpad_backup - do not delete.csv"), 'utf8', (err,backupResult)=>{
+    ise.extension.sendEventToWindow("log","tried to read backup");
+    if(err){
+      ise.extension.sendEventToWindow("log","backup: "+err);
+      backupFileExists = false;
+    }else{
+      backupFileExists = true;
+    }
+  });
+  }, 1000);
+
+  
+
+  setTimeout(() => {
+    
+    if(!backupFileExists && !localFileExists){
+      //Create empty backup file
+      fs.writeFile(path.join(downloadPath,"ise_scratchpad_backup - do not delete.csv"), "", function (err) {
+        if (err) throw err;
+      });
+    }else if (!backupFileExists && localFileExists){
+      //Create backup file and update from existing local file
+      fs.readFile(path.join(__dirname, "kbas.csv"), 'utf8', (err,result)=>{
+        if(err){
+          throw err;
+        }else{
+          fs.writeFile(path.join(downloadPath,"ise_scratchpad_backup - do not delete.csv"), result, function (err) {
+            if (err) throw err;
+          });
+        }        
+      });
+    }else if (backupFileExists && !localFileExists){
+      //Create local file from backup
+      ise.extension.sendEventToWindow("show-backup-detect-info");
+      fs.readFile(path.join(downloadPath,"ise_scratchpad_backup - do not delete.csv"), 'utf8', (err,result)=>{
+        if(err){
+          throw err;
+        }else{
+          fs.writeFile(path.join(__dirname, "kbas.csv"), result, function (err) {
+            if (err){
+              throw err;
+            } else{
+              loadKBAFile();
+            }
+          });
+        }        
+      });
+    }else{
+      //Update existing backup file from local
+      fs.readFile(path.join(__dirname, "kbas.csv"), 'utf8', (err,result)=>{
+        if(err){
+          throw err;
+        }else{
+          fs.writeFile(path.join(downloadPath,"ise_scratchpad_backup - do not delete.csv"), result, function (err) {
+            if (err) throw err;
+          });
+        }        
+      });
+    }
+    
+  }, 1200);
+  
+};
+
+ise.events.onEvent('load-backup-file',()=>{
+  fs.readFile(path.join(downloadPath,"ise_scratchpad_backup - do not delete.csv"), 'utf8', (err,result)=>{
+    if(err){
+      throw err;
+    }else{
+      fs.writeFile(path.join(__dirname, "kbas.csv"), result, function (err) {
+        if (err) throw err;
+      });
+    }        
+  });
+});
 
 ise.events.onEvent('reload-table',()=>{
   loadKBAFile();

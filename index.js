@@ -10,6 +10,8 @@
    let isAddKbaInputActive = false;
    let isMenuActive = false;
    let extensionDirectory = "";
+   let caseData = "";
+   let tabID = 2001;
 
    /* Intercept clicks which have an href - these should be opened in an ISE tab, not the extension window */
    document.addEventListener("click", (e) => {
@@ -41,8 +43,18 @@
     }
   });
 
+  if (ise.case.onUpdate2) {
+    ise.case.onUpdate2(
+      async (receivedCaseData, tabId) => {
+        caseData = receivedCaseData;
+        document.getElementById("currentCase").innerHTML = "Active Case: "+caseData.headers.data.number;
+        //TODO: set active case ID somewhere
+      });
+  }
+
    function copyKbaLink(id){
     navigator.clipboard.writeText("https://me.sap.com/notes/"+id);
+    console.log("download path: "+donwloadPath);
    }
 
    function copyKbaIdAndName(id){
@@ -54,13 +66,37 @@
     navigator.clipboard.writeText(document.getElementById("kba-name-id-"+id).innerText.split(" ")[0]);
    }
 
+   function openPatchNotes(){
+    ise.tab.add(extensionDirectory+"/patch_notes.html", { show: true } );
+   }
+
+   function addToCase(id){
+    console.log("Adding KBA "+id);
+    if(caseData != ""){
+      ise.tab.add("https://itsm.services.sap/attach_knowledge.do?targetTable=sn_customerservice_case&targetId="+caseData.id+"&source=cwf", { show: false } ).then((tab)=>{
+        tabID = tab;
+      });
+      
+      setTimeout(() => {
+        let result = ise.tab.executeJavaScript(tabID, '(() => { document.getElementById("multiField").value = '+id+'; })()');
+        result = ise.tab.executeJavaScript(tabID, '(() => { document.getElementById("attachButton").click(); })()');
+        result = ise.tab.executeJavaScript(tabID, '(() => { document.getElementById("closebutton").click(); })()');
+      }, 3500);
+
+    }else{
+      console.log("no case");
+    }
+   }
+
    function removeRow(id){
+
     document.getElementById("scratchpad-kbas").deleteRow(id);
     
     currentKbaData.splice(id,1);
     
     ise.extension.sendEventToWorker('update-csv',currentKbaData);
     ise.extension.sendEventToWorker('reload-table');
+    ise.extension.sendEventToWorker('update-backup-file');
   }
 
    ise.events.onEvent("load-kba-file",(kbaData)=>{
@@ -118,7 +154,7 @@
         kbaRow.setAttribute("id",i);
         
         let kbaRowContent = kbaRows[i].split("█");
-        kbaRow.innerHTML = "<td><button id=\"btn-delete-"+i+"\" class=\"btn btn-outline-secondary btn-sm\" onclick=\"removeRow("+i+")\"><span class=\"iconTrash\"></span></button></td><td><a style=\"text-decoration:none;\" id=\"kba-name-id-"+i+"\" title=\""+kbaRowContent[1]+"\" href=\""+kbaRowContent[2]+"\">"+kbaRowContent[0]+" - "+kbaRowContent[1].slice(0,67)+((kbaRowContent[1].length >67) ? "..." : "")+"</a></td><td><button class=\"btn btn-outline-secondary btn-sm\" onclick=\"copyKbaLink("+kbaRowContent[0]+")\"><span class=\"iconCopy\"></span><br> Ext. Link</button></td><td><button class=\"btn btn-outline-secondary btn-sm\" onclick=\"copyKbaId("+i+")\"><span class=\"iconCopy\"></span><br> KBA ID</button></td><td><button class=\"btn btn-outline-secondary btn-sm\" onclick=\"copyKbaIdAndName("+i+")\"><span class=\"iconCopy\"></span><br>ID+Name</button></td>"
+        kbaRow.innerHTML = "<td><button style=\"margin-top:20%;\" id=\"btn-delete-"+i+"\" class=\"btn btn-outline-secondary btn-sm\" onclick=\"removeRow("+i+")\"><span class=\"iconTrash\"></span></button></td><td><small><a style=\"text-decoration:none;\" id=\"kba-name-id-"+i+"\" title=\""+kbaRowContent[1]+"\" href=\""+kbaRowContent[2]+"\">"+kbaRowContent[0]+" - "+kbaRowContent[1].slice(0,67)+((kbaRowContent[1].length >67) ? "..." : "")+"</a></small></td><td class=\"mx-1\"><button class=\"btn btn-outline-secondary btn-sm\" onclick=\"copyKbaLink("+kbaRowContent[0]+")\"><span class=\"iconCopy\"></span><br> Ext. Link</button></td><td class=\"mx-1\"><button class=\"btn btn-outline-secondary btn-sm\" onclick=\"copyKbaId("+i+")\"><span class=\"iconCopy\"></span><br> KBA ID</button></td><td class=\"mx-1\"><button class=\"btn btn-outline-secondary btn-sm\" onclick=\"copyKbaIdAndName("+i+")\"><span class=\"iconCopy\"></span><br>ID+Name</button></td><td class=\"mx-1\"><button class=\"btn btn-outline-secondary btn-sm\" onclick=\"addToCase("+kbaRowContent[0]+")\">Add<br>to Case</button></td>"
         
         windowKbaTableContent.appendChild(kbaRow);
         
@@ -138,6 +174,10 @@
 
    }
 
+   function getKbaTitle(kbaWindow){
+    console.log("loaded KBA page");
+   }
+
    function addKba(){
     //trim and split new KBA string (<kbaid> - <kbaname>)
     let kbaSplit = document.getElementById("newKbaInput").value.trim().split(" - ");
@@ -151,6 +191,9 @@
       for(let i=2; i<kbaSplit.length; i++){
         kbaSplit[1] = kbaSplit[1]+" - "+kbaSplit[i];
       }
+    }else{
+      //TODO: Try to fetch name from opening KBA
+      
     }
 
     if(kbaSplit.length>1){
@@ -166,6 +209,7 @@
     }
 
     document.getElementById("newKbaInput").value = "";
+    ise.extension.sendEventToWorker('update-backup-file');
    }
 
    function menuDropdown(){
@@ -242,6 +286,7 @@
 
     ise.extension.sendEventToWorker('update-csv',currentKbaData);
     ise.extension.sendEventToWorker('reload-table');
+    ise.extension.sendEventToWorker('update-backup-file');
    }
 
    //Request __dirname from worker
@@ -266,7 +311,8 @@
       document.getElementById("kba-format-error").style.display = "block";
     }
    });
-   //ISSUE: IMPORT BUTTON ONLY WORKS FOR THE FIRST TIME
+
+   
    function importCsvFile(){
     importedCsvFile = [];
     var input = document.createElement('input');
@@ -351,4 +397,12 @@
     }else{
       ise.extension.sendEventToWorker('reload-table');
     }
-  }
+  };
+
+  ise.events.onEvent('show-backup-detect-info',()=>{
+    document.getElementById("backup-detect").style.display = "block";
+  });
+
+  ise.events.onEvent("log", (result) => {
+    console.log(result);
+   });

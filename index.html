@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" type="text/css" href="index.css" />
   <link rel="stylesheet" type="text/css" href="./lib/bootstrap.css" />
   <link rel="stylesheet" type="text/css" href="./lib/bootstrap-reboot.css" />
-  <link rel="stylesheet" type="text/css" href="./lib/animate.css" />
+  <link rel="stylesheet" type="text/css" href="./lib/animate.css" />  
+  <link rel="stylesheet" type="text/css" href="index.css" />
   <script src="./lib/bootstrap.js"></script>
   <!--Override Bootstrap dark hover table colors to ISE colors-->
   <style>
@@ -22,18 +22,34 @@
   <div class="ise-extension" style="background: var(--background2);">
 
     <div class="ise-extension-header">
-      <div id="currentCase" style="margin-top: 4.5%; margin-left: 25%;">Active Case: N/A</div>
+      <div id="currentCase" style="margin-top: 4.5%; margin-left: 20%;">Active Case: N/A</div>
+        <!--Snap to right button-->
+        <div class="ise-extension-header-buttons">
+          <div
+            class="ise-button"
+            onclick="snapToRight()"
+            aria-label="Snap Extension to the Right"
+            data-toggle="tooltip"
+            data-placement="bottom"
+            title="Snap Extension to the Right"
+          >
+            <i class="fas fa-columns"></i>
+          </div>
+        </div>
+      
     </div>
 
     <div class="ise-extension-content" id="windowContent">
 
 
       <div style="background: var(--background2); top: 0%; padding-bottom:1%; position:sticky; padding-top:1%; padding-right: 5%; padding-left: 5%;">
+        <!--Backup automatic import message-->
         <div id ="backup-detect" style="display:none; margin:1%; position:sticky;" class="alert alert-dark alert-dismissible fade show" role="alert">
           <button type="button" class="btn btn-outline-secondary btn-sm" onclick="this.parentElement.style.display='none';">
             <span>&times;</span>
           </button>
           Backup file loaded automatically since no existing KBA list was detected <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(generally this happens when a new version of the extension is released)
+          <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>You can open the menu and click on the version to see changes and new features</small>
         </div>
         <div class="input-group mb-3">
           <!--Search KBA and menu panel--> 
@@ -46,13 +62,13 @@
             <!--Export-->
             <button style="width: 210px; background-color: var(--background2);" type="button" id="exportCsv" class="btn btn-outline-secondary btn-sm dropbtn" onclick="exportCsvFile()"><div style="float: left;"><span style="margin-right: 15%;" class="iconExport" title="Export KBA File"></span>Export KBA File</div></button>
             <!--Reset File to zero-->
-            <button style="width: 210px; background-color: var(--background2);" type="button" id="exportCsv" class="btn btn-outline-secondary btn-sm dropbtn" onclick="resetCsvFile()"><div style="float: left;"><span style="margin-right: 10.7%;" class="iconRefresh" title="Export KBA File"></span>Reset KBA File to Empty</div></button>
+            <button style="width: 210px; background-color: var(--background2);" type="button" id="exportCsv" class="btn btn-outline-secondary btn-sm dropbtn" onclick="resetCsvFile()"><div style="float: left;"><span style="margin-right: 10.7%;" class="iconRefresh" title="Reset KBA File"></span>Reset KBA File to Empty</div></button>
             <!--version info-->
-            <button style="width: 210px; background-color: var(--background2);" type="button" id="exportCsv" class="btn btn-outline-secondary btn-sm dropbtn" onclick="openPatchNotes()"><div style="float: left;"><span style="margin-right: 10.7%;" class="iconVersion" title="Export KBA File"></span>Version: 1.2</div></button>
+            <button style="width: 210px; background-color: var(--background2);" type="button" id="exportCsv" class="btn btn-outline-secondary btn-sm dropbtn" onclick="openPatchNotes()"><div style="float: left;"><span style="margin-right: 18%;" class="iconVersion" title="Version Info"></span>Version: 1.4</div></button>
             </div>
             </div>
           </div>  
-          <input type="text" class="form-control bg-light" placeholder="Search in KBA title" oninput="searchKba(this.value)" id="searchInput">
+          <input type="text" class="form-control bg-light" placeholder="Search in KBA title  (Shift+F)" oninput="searchKba(this.value)" id="searchInput">
           <div class="input-group-append">
             <button type="button" style="float: right; margin-top: 1%; margin-right: 2%;" class="btn btn-outline-secondary btn-sm dropbtn" onclick="toggleReorder()"20><span class="iconSort" title="Reorder KBAs"></span></button>
           </div>
@@ -66,13 +82,20 @@
       
       
       
-      <!--Add KBA tab-->
-      <button class="btn-secondary addKbaTab shadow-none" id="addKbaTab" onclick="toggleAddKba()">
-        <small style="margin-top: -10%;">Add KBA&nbsp;<span class="iconEnter"></span></small>
-        
-      </button>
-      <div id="addKbaInput" class="bg-secondary addKbaInput">
-        <input type="text" class="form-control bg-light" placeholder="Input a KBA entry as '12345 - KBA Title' and press Enter" id="newKbaInput">
+      <!--Add KBA and KBA to Case tab-->
+      <div style="display: inline;">
+        <button style="margin-left: -11%;" class="btn-secondary addKbaTab shadow-none" id="addKbaTab" onclick="toggleAddKba()">
+          <small style="margin-top: -10%;">Add KBA&nbsp;<span class="iconEnter"></span></small>
+        </button>
+        <button style="margin-left: 11%;" class="btn-secondary addKbaTab shadow-none" id="kbaToCaseTab" onclick="toggleKbaToCase()">
+          <small style="margin-top: -10%;">KBA to Case <span class="iconShift"></span> + <span class="iconEnter"></span></small>
+        </button>
+        <div style="margin-left: -11%;" id="addKbaInput" class="bg-secondary addKbaInput">
+          <input type="text" class="form-control bg-light" placeholder="Input a KBA entry as '12345 - KBA Title' and press Enter" id="newKbaInput">
+        </div>
+        <div style="margin-left: -11%;" id="kbaToCase" class="bg-secondary addKbaInput">
+          <input type="text" class="form-control bg-light" placeholder="Input a KBA ID and press Enter to attach it to the current case" id="kbaToCaseInput">
+        </div>
       </div>
 
       <!--Error for incorrect KBA input-->
@@ -80,7 +103,12 @@
         <button type="button" class="btn btn-outline-danger btn-sm" onclick="this.parentElement.style.display='none';">
           <span>&times;</span>
         </button>
-        <strong>Incorrect KBA Input...&nbsp;&nbsp;</strong>Please enter KBA as "ID - Title"
+        <span id="error-message"><strong>Incorrect KBA Input...&nbsp;&nbsp;</strong>Please enter KBA as "ID - Title"</span>
+      </div>
+
+      <!--Success div for attaching KBA to case-->
+      <div id ="kba-success" style="display:none; bottom:5%; margin:1%; margin-bottom: 4%; position:sticky;" class="alert alert-success alert-dismissible fade show" role="alert">
+        <span id="success-message">KBA Attached to Currently Active Case</span>
       </div>
          
     </div>

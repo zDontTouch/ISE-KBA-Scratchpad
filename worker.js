@@ -48,9 +48,7 @@ const checkBackupFile = () => {
   
     //Check if local file exists
   fs.readFile(path.join(__dirname, "kbas.csv"), 'utf8', (err,result)=>{
-    ise.extension.sendEventToWindow("log","tried to read local");
     if(err){
-      ise.extension.sendEventToWindow("log","local: "+err);
       localFileExists = false;
     }else{
       localFileExists = true;
@@ -60,9 +58,7 @@ const checkBackupFile = () => {
   setTimeout(() => {
       //Check if backup file exists
   fs.readFile(path.join(downloadPath, "ise_scratchpad_backup - do not delete.csv"), 'utf8', (err,backupResult)=>{
-    ise.extension.sendEventToWindow("log","tried to read backup");
     if(err){
-      ise.extension.sendEventToWindow("log","backup: "+err);
       backupFileExists = false;
     }else{
       backupFileExists = true;

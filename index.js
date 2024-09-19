@@ -217,10 +217,13 @@
 
    function getKbaTitle(kbaWindow){
     //todo
-    console.log("loaded KBA page");
    }
 
    function addKba(){
+    //reset table by searching an empty string
+    searchKba("");
+    document.getElementById("searchInput").value = "";
+
     //trim and split new KBA string (<kbaid> - <kbaname>)
     let kbaSplit = document.getElementById("newKbaInput").value.trim().split(" - ");
     //detect if KBA was entered as "X - Y" or "X-Y" ("X - Y" will fail to split into array)

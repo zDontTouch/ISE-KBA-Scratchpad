@@ -161,3 +161,48 @@ ise.events.onEvent('read-import-file',(path)=>{
   });  
 });
 
+ise.events.onEvent('add-kba-to-case',async (data)=>{
+  ise.extension.sendEventToWindow("log","triggered event "+data);
+  let ret = false;
+  let caseId = data.split("||")[0];
+  let kbaId = data.split("||")[1];
+  ise.extension.sendEventToWindow("log",caseId);
+  ise.extension.sendEventToWindow("log",kbaId);
+    const attachKnowledgeDetails = {
+      sysparm_processor: "SAP_Attach_Knowledge_Utils_AJAX",
+      sysparm_scope: "global",
+      sysparm_want_session_messages: "true",
+      sysparm_name: "attachKnowledgeAJAX",
+      sysparm_targetId: caseId,
+      sysparm_kbanumber: kbaId,
+      sysparm_pilotcustomer: "",
+      sysparm_synch: "true",
+      "ni.nolog.x_referer": "ignore",
+      x_referer: `attach_knowledge.do?targetTable=sn_customerservice_case&targetId=${caseId}&source=agent_workspace`,
+    };
+   
+    const formItems = [];
+    for (var property in attachKnowledgeDetails) {
+      formItems.push(
+        encodeURIComponent(property) +
+          "=" +
+          encodeURIComponent(attachKnowledgeDetails[property])
+      );
+    }
+   
+    const response = await fetch("/xmlhttp.do", {
+      method: "POST",
+      headers: {
+        Accept: "*/*",
+        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+        "X-UserToken": window.g_ck,
+        credentials: "same-origin",
+      },
+      body: formItems.join("&"),
+    });
+   
+    if (response.status === 200) {
+      ret = (await response.text()).includes(kbaId);
+    }
+    ise.extension.sendEventToWindow('log',"response: "+ret);
+});

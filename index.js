@@ -74,9 +74,10 @@
         caseData = receivedCaseData;
         caseTabId = tabId;
         try{
-          document.getElementById("currentCase").innerHTML = "Active Case: "+receivedCaseData.headers.data.number;
+          document.getElementById("currentCase").style = "margin-top: 2%; color:white; margin-left: -30%;";
+          document.getElementById("currentCase").innerHTML = "<span style=\"font-weight: 600; font-size:x-large; margin-right:75px;\">KBA Scratchpad </span><span> Active Case: "+receivedCaseData.headers.data.number+"</span>";
         }catch(err){
-          document.getElementById("currentCase").innerHTML = "Active Case: N/A";
+          document.getElementById("currentCase").innerHTML = "<span style=\"font-weight: 600; font-size:x-large; margin-right:75px;\">KBA Scratchpad </span><span>Active Case: N/A</span>";
         }
       });
   }
@@ -117,7 +118,6 @@
       setTimeout(() => {
         document.getElementById("kba-success").style.display = "none";
       }, 8300);
-
     }else{
       setAndDisplayError("No case detected to add KBA");
     }
@@ -196,7 +196,7 @@
         kbaRow.setAttribute("id",i);
         
         let kbaRowContent = kbaRows[i].split("█");
-        kbaRow.innerHTML = "<td><button style=\"margin-top:32%;\" id=\"btn-delete-"+i+"\" class=\"btn btn-outline-secondary btn-sm\" onclick=\"removeRow("+i+")\"><span class=\"iconTrash\"></span></button></td><td><p style=\"font-size:15px;\"><span class=\"iconLink\"></span> <a style=\"text-decoration:none;\" id=\"kba-name-id-"+i+"\" title=\""+kbaRowContent[1]+"\" href=\""+kbaRowContent[2]+"\">"+kbaRowContent[0]+" - "+kbaRowContent[1].slice(0,67)+((kbaRowContent[1].length >67) ? "..." : "")+"</a></p></td><td class=\"mx-1\"><button class=\"btn btn-outline-secondary btn-sm\" onclick=\"copyKbaLink("+kbaRowContent[0]+")\"><span class=\"iconCopy\"></span><br><small> Ext. Link</small></button></td><td class=\"mx-1\"><button class=\"btn btn-outline-secondary btn-sm\" onclick=\"copyKbaId("+i+")\"><span class=\"iconCopy\"></span><br><small> KBA ID</small></button></td><td class=\"mx-1\"><button class=\"btn btn-outline-secondary btn-sm\" onclick=\"copyKbaIdAndName("+i+")\"><span class=\"iconCopy\"></span><br><small>ID+Name</small></button></td><td class=\"mx-1\"><button class=\"btn btn-outline-secondary btn-sm\" onclick=\"addToCase("+kbaRowContent[0]+")\"><small>Add<br>to Case<small></button></td>";
+        kbaRow.innerHTML = "<td><button style=\"margin-top:32%;\" id=\"btn-delete-"+i+"\" class=\"btn btn-outline-secondary btn-sm\" onclick=\"removeRow("+i+")\"><span class=\"iconTrash\"></span></button></td><td><p style=\"font-size:15px;\"><span class=\"iconLink\"></span> <a style=\"text-decoration:none;\" id=\"kba-name-id-"+i+"\" title=\""+kbaRowContent[1]+"\" href=\""+kbaRowContent[2]+"\">"+kbaRowContent[0]+" - "+kbaRowContent[1].slice(0,67)+((kbaRowContent[1].length >67) ? "..." : "")+"</a></p></td><td class=\"mx-1\"><button class=\"btn btn-outline-secondary btn-sm\" onclick=\"copyKbaLink("+kbaRowContent[0]+")\"><span class=\"iconCopy\"></span><br><small> Ext. Link</small></button></td><td class=\"mx-1\"><button class=\"btn btn-outline-secondary btn-sm\" onclick=\"copyKbaId("+i+")\"><span class=\"iconCopy\"></span><br><small> KBA ID</small></button></td><td class=\"mx-1\"><button class=\"btn btn-outline-secondary btn-sm\" onclick=\"copyKbaIdAndName("+i+")\"><span class=\"iconCopy\"></span><br><small>ID+Name</small></button></td><td class=\"mx-1\"><button class=\"btn btn-outline-secondary btn-sm\" onclick=\"addToCase('"+kbaRowContent[0]+"')\"><small>Add<br>to Case<small></button></td>";
         
         windowKbaTableContent.appendChild(kbaRow);
         
